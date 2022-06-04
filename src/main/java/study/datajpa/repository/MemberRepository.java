@@ -2,13 +2,12 @@ package study.datajpa.repository;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.*;
 import org.springframework.data.repository.query.Param;
 import study.datajpa.entity.Member;
 
+import javax.persistence.LockModeType;
+import javax.persistence.QueryHint;
 import java.util.List;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
@@ -36,4 +35,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Override
     @EntityGraph(attributePaths = ("team"))
     List<Member> findAll();
+
+    @QueryHints(value = @QueryHint(name = "org.hibernate.readOnly", value = "true"))
+    Member findReadOnlyByUserName(String userName);
+
+    // select for update, 비관적 Lock (JPA 책에서 트랜잭션과 Lock 부분 참고)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Member> findLockByUserName(String userName);
 }

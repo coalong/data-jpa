@@ -88,4 +88,32 @@ class MemberTest {
         }
     }
 
+    @Test
+    public void queryHint() {
+        // given
+        Member member = new Member("member1", 10);
+        memberRepository.save(member);
+        em.flush();
+        em.clear();
+
+        // when
+        Member findMember = memberRepository.findReadOnlyByUserName("member");
+        findMember.setUserName("member2");
+
+        em.flush();
+    }
+
+    @Test
+    public void lock() {
+        //given
+        Member member1 = new Member("member1", 10);
+        memberRepository.save(member1);
+        em.flush();
+        em.clear();
+
+        //when
+        List<Member> result = memberRepository.findLockByUserName("member1");
+    }
+
+
 }
