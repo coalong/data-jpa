@@ -12,6 +12,8 @@ import study.datajpa.entity.Member;
 import study.datajpa.entity.MemberDto;
 import study.datajpa.exception.MemberNotFound;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -23,6 +25,9 @@ class MemberRepositoryTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @PersistenceContext
+    EntityManager em;
 
     @Test
     public void testMember() {
@@ -86,6 +91,30 @@ class MemberRepositoryTest {
         assertThat(page.getTotalPages()).isEqualTo(2);        // 전체 페이지 갯수
         assertThat(page.isFirst()).isTrue();                           // 첫번째 페이지 여부
         assertThat(page.hasNext()).isTrue();                           // 다음 페이지 여부
+    }
+
+    @Test
+    public void bulkUpdate() {
+        //given
+        memberRepository.save(new Member("member1", 10));
+        memberRepository.save(new Member("member2", 19));
+        memberRepository.save(new Member("member3", 20));
+        memberRepository.save(new Member("member4", 21));
+        memberRepository.save(new Member("member5", 40));
+
+        //when
+        int resultCount = memberRepository.bulkAgePlus(20);
+
+        // 벌크 연산은 영속성 컨텍스트를 무시하고 DB에 바로 쿼리 날린다. 따라서 벌크 연산 하고 나서는 영속성 컨택스트 초기화해야한다.
+        em.flush();
+        em.clear();
+        // 위에 초기화 유무에 따라서 아래 예시 결과 확인해보기
+        List<Member> result = memberRepository.findByUserName("members");
+        Member member5 = result.get(0);
+        System.out.println("member5 = " + member5);
+
+        //then
+        assertThat(resultCount).isEqualTo(3);
     }
 
 }
