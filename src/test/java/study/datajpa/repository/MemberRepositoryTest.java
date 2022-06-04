@@ -8,20 +8,19 @@ import org.springframework.transaction.annotation.Transactional;
 import study.datajpa.entity.Member;
 import study.datajpa.exception.MemberNotFound;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
 @Rollback(value = false)
 class MemberRepositoryTest {
+
     @Autowired
     MemberRepository memberRepository;
 
     @Test
     public void testMember() {
-        Member member  = new Member("memberA");
+        Member member = new Member("memberA");
         Member saveMember = memberRepository.save(member);
 
         Member findMember = memberRepository.findById(saveMember.getId()).orElseThrow(MemberNotFound::new);

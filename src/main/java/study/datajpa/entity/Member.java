@@ -1,24 +1,40 @@
 package study.datajpa.entity;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
+// 생성자는 protected 까지만! private X!
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@ToString(of = {"id", "username", "age", "team"})
 public class Member {
     @Id
     @GeneratedValue
+    @Column(name = "member_id")
     private Long id;
     private String userName;
+    private int age;
+
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
 
     public Member(String userName) {
         this.userName = userName;
+    }
+
+    public Member(String userName, int age, Team team) {
+        this.userName = userName;
+        this.age = age;
+        changeTeam(team);
+    }
+
+    public void changeTeam(Team team) {
+        this.team = team;
+        // team 리스트에서도 member 추가 해준다.
+        team.getMembers().add(this);
     }
 }
