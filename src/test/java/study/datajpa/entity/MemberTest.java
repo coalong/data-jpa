@@ -2,9 +2,12 @@ package study.datajpa.entity;
 
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
+import study.datajpa.repository.MemberRepository;
+import study.datajpa.repository.TeamRepository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -18,6 +21,12 @@ class MemberTest {
     // 영속성 context Annotation이  EntityManager를 주입 받아온다.
     @PersistenceContext
     EntityManager em;
+
+    @Autowired
+    MemberRepository memberRepository;
+
+    @Autowired
+    TeamRepository teamRepository;
 
     @Test
     public void entityTest() {
@@ -50,6 +59,32 @@ class MemberTest {
         for (Member member : members) {
             System.out.println("member = " + member);
             System.out.println("-> member.team = " + member.getTeam());
+        }
+    }
+
+    @Test
+    public void findMemberLazy() throws Exception {
+        //given
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+        teamRepository.save(teamA);
+        teamRepository.save(teamB);
+        memberRepository.save(new Member("member1", 10, teamA));
+        memberRepository.save(new Member("member2", 20, teamB));
+
+        em.flush();
+        em.clear();
+
+        //when
+        //지연 로딩 실행 될 때 (N + 1 문제 발생)
+        //team의 데이터 조회할 때마다 쿼리가 실행
+//        List<Member> members = memberRepository.findAll();
+        //join fetch하는 쿼리문 실행 (연관된 엔티티를 한번에 조회할 때 필요)
+        List<Member> members = memberRepository.findMemberFetchJoin();
+
+        //then
+        for (Member member : members) {
+            member.getTeam().getName();
         }
     }
 
