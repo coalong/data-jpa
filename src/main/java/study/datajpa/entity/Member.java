@@ -10,7 +10,7 @@ import javax.persistence.*;
 // 생성자는 protected 까지만! private X!
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @ToString(of = {"id", "username", "age", "team"})
-public class Member {
+public class Member extends JpaBaseEntity {
     @Id
     @GeneratedValue
     @Column(name = "member_id")

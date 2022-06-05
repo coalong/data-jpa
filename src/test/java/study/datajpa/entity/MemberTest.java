@@ -115,5 +115,26 @@ class MemberTest {
         List<Member> result = memberRepository.findLockByUserName("member1");
     }
 
+    @Test
+    public void testEntity() throws InterruptedException {
+        //given
+        Member member = new Member("member1");
+        memberRepository.save(member);  // @PrePersist  실행
+
+        Thread.sleep(100);
+        member.setUserName("member2");
+
+        em.flush();
+        em.clear();
+
+        //when
+        Member findMember = memberRepository.findById(member.getId()).get();
+
+        //then
+        System.out.println(findMember.getCreateDate());
+        System.out.println(findMember.getUpdateDate());
+
+    }
+
 
 }
