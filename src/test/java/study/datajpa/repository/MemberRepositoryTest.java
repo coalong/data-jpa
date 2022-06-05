@@ -117,4 +117,9 @@ class MemberRepositoryTest {
         assertThat(resultCount).isEqualTo(3);
     }
 
+    @Test
+    public void findMemberCustom() {
+        List<Member> memberCustom = memberRepository.findMemberCustom();
+    }
+
 }

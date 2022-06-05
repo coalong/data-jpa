@@ -10,7 +10,7 @@ import javax.persistence.LockModeType;
 import javax.persistence.QueryHint;
 import java.util.List;
 
-public interface MemberRepository extends JpaRepository<Member, Long> {
+public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryCustom {
 
     @Query("select m from Member m where m.userName = :username and m.age = :age")
     List<Member> findUser(@Param("username") String username, @Param("age") int age);
@@ -26,7 +26,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 
     // 스프링 데이터 JPA
-
     Page<Member> findByAge(int age, Pageable pageable);
 
     List<Member> findByUserName(String username);
