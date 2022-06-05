@@ -2,10 +2,13 @@ package study.datajpa.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import study.datajpa.entity.Member;
+import study.datajpa.entity.MemberDto;
 import study.datajpa.repository.MemberRepository;
 
 import javax.annotation.PostConstruct;
@@ -28,6 +31,19 @@ public class MemberController {
 
     @PostConstruct
     public  void init() {
-        memberRepository.save(new Member("userA"));
+        for (int i = 0; i < 100; i++) {
+            memberRepository.save(new Member("userA" + i, i));
+        }
+    }
+
+    @GetMapping("/members2/{id}")
+    public String findMember2(@PathVariable("id") Member member) {
+        return member.getUserName();
+    }
+
+    @GetMapping("/members")
+    public Page<MemberDto> list(Pageable pageable) {
+        Page<Member> page = memberRepository.findAll(pageable);
+        return page.map(member -> new MemberDto(member.getId(), member.getUserName(), null));
     }
 }
